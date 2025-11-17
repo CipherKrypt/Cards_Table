@@ -1,6 +1,6 @@
-from Deck import Card
+from Deck import *
 
-class Player:
+class Player():
     """
     Represents a player in a card game, capable of holding cards and
     performing actions like raise, call, and fold.
@@ -16,6 +16,15 @@ class Player:
     """
 
     def __init__(self, name: str, chips: int = 100):
+        """Initialize the Player class.
+
+        Args:
+            name (str): Name of the player.
+            chips (int, optional): User defined amount chips. Defaults to 100.
+
+        Raises:
+            Exception: If chips is not a positive non-zero integer.
+        """
         self.name = name
         self.hand = []
         if chips > 0 :
@@ -32,24 +41,25 @@ class Player:
         """
         self.hand.append(card)
 
-    def show_hand(self)-> list:
+    def show_hand(self)-> list[Card]:
         """
         Returns a list of the player's current hand containing `Card` objects.
+
+        Returns:
+            list: Returns the player's current hand as a list of `Card` objects.
         """
         return self.hand
 
     def print_hand(self)-> str:
         """
-        Returns a string representation of the player's hand.
+        Prints a string representation of the player's hand.
 
-        Returns:
-            str: Returns a comma-separated string of cards in hand.
         """
-        return ', '.join(str(card) for card in self.hand)
+        print(', '.join(str(card) for card in self.hand)) if len(self.hand) > 0 else print(f"{self.name} has no cards in hand.")
 
-    def bet(self, amount: int):
+    def bet(self, amount: int = 0, all_in: bool = False)-> int:
         """
-        Bets a specified amount of chips.
+        Bets a specified amount of chips. Can be used for calling or raising.
 
         Args:
             amount (int): The amount to bet.
@@ -57,30 +67,14 @@ class Player:
         Raises:
             Exception: If the amount exceeds available chips.
         """
+        if all_in:
+            amount = self.chips
         if amount > self.chips:
             raise Exception(f"{self.name} does not have enough chips to bet {amount}.")
         self.chips -= amount
         return amount
 
-    def call(self, previous_bet: int):
-        """
-        Calls the previous bet by matching the amount.
-
-        Args:
-            previous_bet (int): The amount to match.
-        """
-        return self.bet(previous_bet)
-
-    def raise_bet(self, amount: int = 1, all_in: bool = False):
-        """
-        Raises the bet by a specified amount.
-
-        Args:
-            amount (int): The additional amount to raise.
-        """
-        return self.bet(self.chips if all_in else amount)
-
-    def fold(self)-> list:
+    def fold(self)-> list[Card]:
         """
         Folds the player's hand, removing them from the current round.
         Returns:
