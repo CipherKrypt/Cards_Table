@@ -161,6 +161,163 @@ class Card():
         return f"{self.suite.symbol}{self.rank.rank}"
 
         
+class Deck():
+    """Initializes a `Deck` object containing `Card` objects, representing a standard deck of playing cards.
+
+    The Deck class provides methods to create, shuffle, cut, and deal cards from the deck.
+
+    Attributes:
+        deck (list): A list of `Card` objects representing the current deck of cards.
+        sub_decks (list): A list to hold sub-decks if needed.
+        pile (list): A list to hold dealt cards.
+
+    Methods:
+        _str_(): Returns string representation of the deck. Four rows containing 13 cards each.
+        create_deck(): Creates a standard deck of 52 playing cards with customizable point allocation based on game type.
+        shuffle(): Shuffles the deck of cards randomly.
+        riffle_shuffle(): Performs a riffle shuffle on the deck.
+        cut(): Cuts the deck at a specified or random position.
+        deal(): Deals a card from the top of the deck and adds it to the pile.
+    """
+    Suites = {}
+    for suite in ["spade","heart","diamond","club"]:
+        Suites[suite] = Suite(suite)
+
+    ranks = ["A",2,3,4,5,6,7,8,9,10,"J","Q","K"]
+
+    def __init__(self):
+        """
+        The function initializes three empty lists for a deck, sub-decks, and a pile.
+        """
+        self.deck = []
+        self.sub_decks = []
+        self.pile = []
+
+    def __str__(self):
+        """Returns string representation of Deck
+
+        Returns:
+            str: A formatted string representation of the deck in 4 rows. Displays Card `Suite` and `Rank`.
+        """
+        def get_split(deck:list)-> int:
+            """
+            Takes a deck and calculates the split point for dividing a deck of cards into 4 even rows.
+            
+            Args:
+                deck (list): Takes a list `deck` as input and returns an integer representing a split point in the deck. 
+            Returns:
+                Returns a 4 row formatted string representation of the deck of cards, with each card's suite symbol and rank displayed.
+            """
+            split = len(deck)//4
+            return split
+
+        if self.sub_decks:
+            pass
+        else:
+            deck = ""
+            split = get_split(self.deck)
+            i = 1
+            for card in self.deck:
+                if i == split:
+                    end = "\n"
+                    i = 0
+                else:
+                    end = " "  
+                symbol = card.suite.symbol
+                rank = card.rank.rank
+                deck += f"{symbol}{rank}{end}"
+                i+=1
+
+        return deck
+        
+    def create_deck(self,game:str = "blackjack", Suites:dict = Suites, ranks = ranks, include_joker = False)-> Deck:
+        """Function to create a standard deck of playing cards with customizable point allocation based on game type.
+
+        Creates a deck of cards by iterating through predefined suites and ranks, assigning point values based on the specified game type.
+
+        Args:
+            game (str, optional): String representation of a game to decide point allocation to cards. One of ["blackjack","poker","rummy"]. Defaults to "blackjack".
+            Suites (dict, optional): User can enter a custom dictionary containing Suite objects. Defaults to dictionary Suites containing default Suite objects.
+            ranks (list, optional): User can enter a custom list containing rank names. Defaults to ranks.
+            include_joker (bool, optional): If True, includes Joker cards in the deck. Defaults to False.
+
+        Returns:
+            Deck: The Deck object itself, now populated with Card objects representing a standard deck of playing cards.
+        """
+        if include_joker:
+            # TODO Add two Joker cards with unique point values and wildness properties.
+            pass
+        if game == "blackjack":
+            for suite in Suites.keys():
+                for rank in ranks:
+                    if rank in ["J","Q","K"]:
+                        point = 10
+                    elif rank == "A":
+                        point = (1,11)
+                    else:
+                        point = rank
+                    card = Card(Suites[suite],Rank(rank,point))
+                    self.deck.append(card)
+        return self
+
+    def shuffle(self)-> Deck:
+        """Shuffles the deck of cards randomly and returns the Deck object itself.
+
+        Returns:
+            Deck: Returns the Deck object itself after shuffling the deck of cards.
+        """
+        from random import shuffle
+        shuffle(self.deck)
+
+        return self
+
+    def riffle_shuffle(self) -> Deck:
+        """Simulates a riffle shuffle on the deck of cards.
+
+        Returns:
+            Deck: Returns the Deck object itself after performing a riffle shuffle.
+        """
+        new_deck = []
+        for i in range(26):
+            new_deck.extend([self.deck[i],self.deck[i+26]])
+        self.deck = new_deck
+
+        return self
+
+    def cut(self,cut_position:None|int = None)-> str:
+        """Cuts the deck at a specified or random position.
+
+        Args:
+            cut_position (None | int, optional): User can provide a position to cut the Deck. Defaults to None and selects a position at random.
+
+        Returns:
+            str: Returns a message indicating the position at which the deck was cut.
+        """
+        from random import randint
+        if cut_position is None:
+            cut_position = randint(9,41)
+
+            self.deck = self.deck[cut_position:]+self.deck[:cut_position]
+            
+            return f"Deck cut at position {cut_position}"
+
+    def deal(self,add_to_pile = True)-> Card:
+        """Simulates dealing a card from the top of the deck.
+
+        Simulates dealing a card from the top of the deck by removing and returning the first card in the deck list. The dealt card is optionally added to a pile of dealt cards.
+
+        Args:
+            add_to_pile (bool, optional): User can choose whether the dealt card is burned or saved into a pile. Defaults to True.
+
+        Returns:
+            Card: Returns the dealt `Card` object.
+        """
+        card = self.deck.pop()
+        if add_to_pile:
+            self.pile.append(card)
+
+        return card
+                            
 
 
 
