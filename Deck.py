@@ -98,10 +98,10 @@ class Rank():
         
         """
 
-        rank_dict = {"A":"Ace","1":"One","2":"Two","3":"Three","4":"Four","5":"Five","6":"Six","7":"Seven","8":"Eight","9":"Nine","10":"Ten","J":"Jack","Q":"Queen","K":"King"}
+        self.rank_dict = {"A":"Ace","1":"One","2":"Two","3":"Three","4":"Four","5":"Five","6":"Six","7":"Seven","8":"Eight","9":"Nine","10":"Ten","J":"Jack","Q":"Queen","K":"King"}
         rank = str(rank)
-        if rank in rank_dict.keys():
-            self.rank = rank_dict[rank]
+        if rank in self.rank_dict.keys():
+            self.rank = rank
         else:
             raise Exception('rank should be of type ["A",2,3,4,5,6,7,8,9,10,"J","Q","K"]')
 
@@ -125,9 +125,9 @@ class Rank():
 
         Returns:
             str: A string by combining the string rank and point assigned.
-                 Example: "Rank:'A' Point assigned:11"
+                 Example: "Rank:'Ace' Point assigned:11"
         """
-        return f"Rank:'{self.rank}' Point assigned:{self.point}"
+        return f"Rank:'{self.rank_dict[self.rank]}' Point assigned:{self.point}"
          
 # The `Card` class represents a playing card with a suite and a rank.
 class Card():
@@ -135,8 +135,8 @@ class Card():
     Initializes a Card object with suite and rank attributes for a playing card
 
     Attributes:
-        suite (Suite): Will be of type `Suite` and one of 
-        rank (Rank):
+        suite (Suite): Will be of type `Suite` and one of ["spade","heart","diamond","club"]
+        rank (Rank): Will be of type `Rank` and one of ["A",2,3,4,5,6,7,8,9,10,"J","Q","K"]
 
     Method:
         __str__(): Returns string representation of the card. Example: "♠A" for Ace of Spades
@@ -167,7 +167,7 @@ class Deck():
     The Deck class provides methods to create, shuffle, cut, and deal cards from the deck.
 
     Attributes:
-        deck (list): A list of `Card` objects representing the current deck of cards.
+        deck (list[Card]): A list of `Card` objects representing the current deck of cards.
         sub_decks (list): A list to hold sub-decks if needed.
         pile (list): A list to hold dealt cards.
 
@@ -189,8 +189,9 @@ class Deck():
         """
         The function initializes three empty lists for a deck, sub-decks, and a pile.
         """
-        self.deck = []
-        self.sub_decks = []
+        self.deck = [] # Contanins the Original Deck of Cards
+        #TODO Add functionality to create sub-decks from original deck. Update logic to refer to sub-decks instead of deck directly.
+        self.sub_decks = [] # Contains any sub-decks created from the original deck. Original deck to be a sub-deck itself.
         self.pile = []
 
     def __str__(self):
@@ -301,24 +302,32 @@ class Deck():
             
             return f"Deck cut at position {cut_position}"
 
-    def deal(self,add_to_pile = True)-> Card:
+    def deal(self,position = 0,add_to_pile = True)-> Card:
         """Simulates dealing a card from the top of the deck.
 
         Simulates dealing a card from the top of the deck by removing and returning the first card in the deck list. The dealt card is optionally added to a pile of dealt cards.
 
         Args:
+            position (int, optional): Position from which to deal the card. Defaults to 0 (top of the deck).
             add_to_pile (bool, optional): User can choose whether the dealt card is burned or saved into a pile. Defaults to True.
 
+        Raises:
+            Exception: If the specified position is out of range of the deck.
         Returns:
             Card: Returns the dealt `Card` object.
         """
-        card = self.deck.pop()
+        if position < 0 or position >= len(self.deck):
+            raise Exception("Position out of range")
+        card = self.deck.pop(position)
         if add_to_pile:
             self.pile.append(card)
 
         return card
                             
+def testing():
+    pass
 
+testing()
 
 
 
